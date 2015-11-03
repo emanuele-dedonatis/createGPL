@@ -17,8 +17,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 #include "include/creategpl.hpp"
 
-/*
- * 
+/**
+ * Create [gnuplot](http://www.gnuplot.info/) ".gpl" file from ".dat" binary file with header section.
+ * This program is developed to plot the input file of [maxximino/dpacalc](https://github.com/maxximino/dpacalc)
  */
 int main(int argc, char** argv) {
 
@@ -34,12 +35,16 @@ int main(int argc, char** argv) {
     closeFiles();
         
     cout << endl << "[FINISHED]" << endl << endl;
+    
     return 0;
 }
 
+/**
+ * Parse the input parameters
+ */
 void parseParams(int argc, char** argv) {
     if (argc < 5) { 
-        std::cout << "usage: " << argv[0] << " -in <input_dat> -out <output_dat> -gpl <output_gpl> -num <number_of_traces> -min <x_min> -max <x_max>" << endl;
+        cout << "usage: " << argv[0] << " -in <input_dat> -out <output_dat> -gpl <output_gpl> -num <number_of_traces> -min <x_min> -max <x_max>" << endl;
         exit(0);
     }
     
@@ -80,6 +85,9 @@ void parseParams(int argc, char** argv) {
     cout << endl;
 }
 
+/**
+ * Open the I/O files
+ */
 void openFiles() {
     cout << "Opening input file ..." << flush;
     fin.open(inputFile);
@@ -106,12 +114,18 @@ void openFiles() {
         cout << " [OK]" << endl;
 }
 
+/**
+ * Close the opened files
+ */
 void closeFiles() {
     fin.close();
     fout.close();
     gpl.close();
 }
 
+/**
+ * Parse the header informations
+ */
 void parseInputFile() {
     cout << endl << "Parsing input file ..." << flush;
     
@@ -156,6 +170,9 @@ void parseInputFile() {
     cout << "| File size: " << dim.file << " Bytes" << endl;
 }
 
+/**
+ * Create the .dat output file with the extracted traces samples
+ */
 void createDat() {
     cout << endl << "Creating dat file ... " << flush;
 
@@ -180,6 +197,9 @@ void createDat() {
     cout << "[OK]" << endl;
 }
 
+/**
+ * Create the gnuplot file
+ */
 void createGpl() {
     cout << "Creating gpl file ... " << flush;
         
