@@ -13,16 +13,11 @@ This program is developed to plot the input file of [maxximino/dpacalc](https://
 
 
 ## Usage
-./createGPL 
-
--in 	[file_path]		.dat input file
-
--out 	[file_path]		.dat output file
-
--gpl 	[file_path]		.gpl output file
-
--n 		[int] 				number of traces to compute
-
--min 	[int]					min value for x (sample) range 
-
--max 	[int]					max value for x (sample) range
+| Param | Type			| Desc														| 
+| :----:|:---------:|:-------------------------------:| 
+| -in		|	file path	| input file .dat									|
+| -out	|	file path	| output file .dat								|
+| -gpl	|	file path	| output file .gpl								|
+| -n		|	int				| number of traces to compute			|
+| -min	|	int				| min value for x (sample) range	|
+| -max	|	int				| max value for x (sample) range	|
