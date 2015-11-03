@@ -4,20 +4,13 @@ Create [gnuplot](http://www.gnuplot.info/) ".gpl" file from ".dat" binary file w
 This program is developed to plot the input file of [maxximino/dpacalc](https://github.com/maxximino/dpacalc)
 
 ## Input header file format
-| Size        	| Description		| 
-| :-----------: |:-------------:| 
-| uint32_t	   	| number of trace | 
-| uint32_t      | centered      | 
-| char 					| are neat      | 
-| uint8_t 			| are neat      | 
+| Size        	| Description																| 
+| :-----------: |:-----------------------------------------:| 
+| uint32_t	   	| number of trace 													| 
+| uint32_t      | number of samples per trace      					| 
+| char 					| data type (f - float || d - double)      	| 
+| uint8_t 			| known data length per trace (DPA purpose)	| 
 
-[uint32_t] 	number of trace
-
-[uint32_t] 	number of samples per trace
-
-[char] 			data type (f - float || d - double)
-
-[uint8_t] 	known data length per trace (DPA purpose)
 
 ## Usage
 ./createGPL 
