@@ -160,7 +160,7 @@ int main(int argc, char** argv) {
         gpl << "set xtic auto;" << endl;
         gpl << "set ytic auto;" << endl;
         gpl << "set xrange [" << x_min << ":" << x_max << "];" << endl;
-        gpl << "set key outside right;" << endl;
+        gpl << "set key off;" << endl;
         gpl << "set title \"Power Traces\";" << endl;
         gpl << "set xlabel \"time\";" << endl;
         gpl << "set ylabel \"Power consumption\";" << endl << endl;
