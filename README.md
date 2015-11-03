@@ -8,7 +8,7 @@ This program is developed to plot the input file of [maxximino/dpacalc](https://
 | :-----------: |:-----------------------------------------:| 
 | uint32_t	   	| number of trace 													| 
 | uint32_t      | number of samples per trace      					| 
-| char 					| data type (f - float || d - double)      	| 
+| char 					| data type (f - float or d - double)      	| 
 | uint8_t 			| known data length per trace (DPA purpose)	| 
 
 
