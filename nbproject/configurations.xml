@@ -41,6 +41,9 @@
             <pElem>include</pElem>
           </incDir>
         </ccTool>
+        <linkerTool>
+          <output>creategpl</output>
+        </linkerTool>
       </compileType>
       <item path="creategpl.cpp" ex="false" tool="1" flavor2="0">
       </item>

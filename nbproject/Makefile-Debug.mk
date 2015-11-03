@@ -56,11 +56,10 @@ LDLIBSOPTIONS=
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
-	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/creategpl
+	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk creategpl
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/creategpl: ${OBJECTFILES}
-	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/creategpl ${OBJECTFILES} ${LDLIBSOPTIONS}
+creategpl: ${OBJECTFILES}
+	${LINK.cc} -o creategpl ${OBJECTFILES} ${LDLIBSOPTIONS}
 
 ${OBJECTDIR}/creategpl.o: creategpl.cpp 
 	${MKDIR} -p ${OBJECTDIR}
@@ -73,7 +72,7 @@ ${OBJECTDIR}/creategpl.o: creategpl.cpp
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
-	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/creategpl
+	${RM} creategpl
 
 # Subprojects
 .clean-subprojects:
