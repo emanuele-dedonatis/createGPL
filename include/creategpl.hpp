@@ -24,8 +24,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 #include <stdint.h>
 #include <cstring>
 
+#define N_TRACES_TO_PLOT 10
+
 using namespace std;
 
+/*
+ * Header file informations
+ */
 struct RawHeader {
     uint32_t numtraces;
     uint32_t numsamples_per_trace;
@@ -34,6 +39,9 @@ struct RawHeader {
 };
 RawHeader raw;
 
+/*
+ * Dimension of traces
+ */
 struct Dimensions {
     int n_traces;
     int n_samples;
@@ -45,12 +53,21 @@ struct Dimensions {
 };
 Dimensions dim;
 
-char *inputFile, *outputFile, *gplFile;
+/*
+ * Input parameters
+ */
+char *inputFile, *tracesFile, *meanFile, *gplFile;
 int n_traces = 0, x_min = 0, x_max = 0;
 
+/*
+ * I/O files
+ */
 ifstream fin;
-ofstream fout ,gpl;
+ofstream traces_dat, mean_dat, gpl;
 
+/*
+ * Methods
+ */
 void parseParams(int argc, char** argv);
 void openFiles();
 void closeFiles();

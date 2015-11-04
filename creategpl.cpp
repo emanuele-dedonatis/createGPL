@@ -17,8 +17,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 #include "include/creategpl.hpp"
 
-/*
- * 
+/**
+ * Create [gnuplot](http://www.gnuplot.info/) ".gpl" file from ".dat" binary file with header section.
+ * This program is developed to plot the input file of [maxximino/dpacalc](https://github.com/maxximino/dpacalc)
  */
 int main(int argc, char** argv) {
 
@@ -34,25 +35,31 @@ int main(int argc, char** argv) {
     closeFiles();
         
     cout << endl << "[FINISHED]" << endl << endl;
+    
     return 0;
 }
 
+/**
+ * Parse the input parameters
+ */
 void parseParams(int argc, char** argv) {
     if (argc < 5) { 
-        std::cout << "usage: " << argv[0] << " -in <input_dat> -out <output_dat> -gpl <output_gpl> -num <number_of_traces> -min <x_min> -max <x_max>" << endl;
+        cout << "usage: " << argv[0] << " -in <input_dat> -traces <traces_dat> -mean <mean_dat> -gpl <output_gpl> -num <number_of_traces> -min <x_min> -max <x_max>" << endl;
         exit(0);
     }
     
     cout << endl << "Parsing input parameters ... " << flush;
     for (int i = 1; i < argc; i = i+2) {
         if (i + 1 != argc){
-            if (strncmp (argv[i],"-in",2) == 0) {
+            if (strncmp (argv[i],"-in",3) == 0) {
                 inputFile = argv[i + 1];
-            } else if (strncmp (argv[i],"-out",2) == 0) {
-                outputFile = argv[i + 1];
-            } else if (strncmp (argv[i],"-gpl",2) == 0) {
+            } else if (strncmp (argv[i],"-traces",7) == 0) {
+                tracesFile = argv[i + 1];
+            } else if (strncmp (argv[i],"-mean",5) == 0) {
+                meanFile = argv[i + 1];
+            } else if (strncmp (argv[i],"-gpl",4) == 0) {
                 gplFile = argv[i + 1];
-            } else if (strncmp (argv[i],"-num",2) == 0) {
+            } else if (strncmp (argv[i],"-num",4) == 0) {
                 n_traces = atoi(argv[i + 1]);
             } else if (strncmp (argv[i],"-min",4) == 0) {
                 x_min = atoi(argv[i + 1]);
@@ -66,20 +73,24 @@ void parseParams(int argc, char** argv) {
     }
     cout << "[OK]" << endl;
     
-    cout << "| Input file: " << inputFile << endl;
-    cout << "| Output file: " << outputFile << endl;
-    cout << "| Gpl file: " << gplFile << endl;
+    cout << "| Input data file: " << inputFile << endl;
+    cout << "| Traces data file: " << tracesFile << endl;
+    cout << "| Mean data file: " << tracesFile << endl;
+    cout << "| Gnuplot file: " << gplFile << endl;
     cout << "| Number of traces: ";
     if(n_traces == 0)   cout << "all"<< endl;
     else                cout << n_traces << endl;
     cout << "| From sample: " << x_min << endl;
     cout << "| To sample: ";
-    if(n_traces == 0)   cout << "all"<< endl;
+    if(x_max == 0)   cout << "all"<< endl;
     else                cout << x_max << endl;
     
     cout << endl;
 }
 
+/**
+ * Open the I/O files
+ */
 void openFiles() {
     cout << "Opening input file ..." << flush;
     fin.open(inputFile);
@@ -89,15 +100,23 @@ void openFiles() {
     }else
         cout << " [OK]" << endl;
     
-    cout << "Opening output file ...";
-    fout.open(outputFile);
-    if(fout.fail()) {
+    cout << "Creating traces file ...";
+    traces_dat.open(tracesFile);
+    if(traces_dat.fail()) {
         cerr << " [ERROR]" << endl;
         exit(0);
     }else
         cout << " [OK]" << endl;
     
-    cout << "Opening gpl file ...";
+    cout << "Creating mean file ...";
+    mean_dat.open(meanFile);
+    if(mean_dat.fail()) {
+        cerr << " [ERROR]" << endl;
+        exit(0);
+    }else
+        cout << " [OK]" << endl;
+    
+    cout << "Creating gpl file ...";
     gpl.open(gplFile);
     if(gpl.fail()) {
         cerr << " [ERROR]" << endl;
@@ -106,12 +125,19 @@ void openFiles() {
         cout << " [OK]" << endl;
 }
 
+/**
+ * Close the opened files
+ */
 void closeFiles() {
     fin.close();
-    fout.close();
+    traces_dat.close();
+    mean_dat.close();
     gpl.close();
 }
 
+/**
+ * Parse the header informations
+ */
 void parseInputFile() {
     cout << endl << "Parsing input file ..." << flush;
     
@@ -156,30 +182,57 @@ void parseInputFile() {
     cout << "| File size: " << dim.file << " Bytes" << endl;
 }
 
+/**
+ * Create the .dat output file with the extracted traces samples
+ */
 void createDat() {
-    cout << endl << "Creating dat file ... " << flush;
+    cout << endl << "Creating dat files ... " << flush;
 
     for(int isample = x_min; isample < x_max; isample++) {
-        fout << isample;
+        traces_dat << isample;
+        mean_dat << isample;
+        
+        int n = 0;
+        float mean = 0;
+        float M2 = 0;
+        
         for(int itrace = 0; itrace < n_traces; itrace++) {
+            n++;
+            double delta = 0;
+            double sample = 0;
             fin.seekg (dim.header + (itrace + 1)*dim.knowndata + (itrace)*dim.trace + isample * dim.sample, fin.beg);
             switch ( raw.datatype ) {
                 case 'f':   float fsample; 
                             fin.read((char*)&fsample, dim.sample);
-                            fout << " " << fsample;
+                            traces_dat << " " << fsample;
+                            sample = fsample;
                             break;
                 case 'd':   double dsample; 
                             fin.read((char*)&dsample, dim.sample);
-                            fout << " " << dsample;
+                            traces_dat << " " << dsample;
+                            sample = (float) dsample;
                             break;
             }
+            delta = sample - mean;
+            mean = mean + delta/n;
+            M2 = M2 + delta*(sample - mean);
         }
-        fout << endl;
+        
+        float variance = 0;
+        if (n > 1)
+            variance = M2 / (n - 1);
+        
+        mean_dat << " " << mean << " " << variance;
+        traces_dat << endl;
+        mean_dat << endl;
     }
     
     cout << "[OK]" << endl;
 }
 
+/**
+ * Create the gnuplot file
+ */
 void createGpl() {
     cout << "Creating gpl file ... " << flush;
         
@@ -194,15 +247,50 @@ void createGpl() {
     gpl << "set ylabel \"Power Trace\";" << endl << endl;
 
     gpl << "plot  "; 
-    for(int itrace = 0; itrace < n_traces; itrace++) {
+    for(int itrace = 0; itrace < N_TRACES_TO_PLOT; itrace++) {
         if(itrace != 0){
             gpl << ", " ;
         }
-        gpl << "\""<< outputFile << "\" ";
+        gpl << "\""<< tracesFile << "\" ";
         gpl << "u 1:" << itrace+2 << " ";
         gpl << "t \"" << itrace+1 << "\" ";
         gpl << "with lines";
     }
+    
+    gpl << endl << endl << "set term png size 3000,1500 crop;" << endl;
+    gpl << "set output \"power_traces_mean_" << x_min << "_" << x_max << ".png\";" << endl;
+    gpl << "set autoscale;" << endl;
+    gpl << "set xtic auto;" << endl;
+    gpl << "set ytic auto;" << endl;
+    gpl << "set xrange [" << x_min << ":" << x_max << "];" << endl;
+    gpl << "set key off;" << endl;
+    gpl << "set xlabel \"Sample number\";" << endl;
+    gpl << "set ylabel \"Power Trace Mean\";" << endl;
+    gpl << "set style line 1 lw 5 linecolor rgb \"blue\";"  << endl << endl;
+
+    gpl << "plot  ";
+    gpl << "\""<< meanFile << "\" ";
+    gpl << "u 1:2 ";
+    gpl << "t \"mean\" ";
+    gpl << "with lines ls 1";
+    
+    gpl << endl << endl << "set term png size 3000,1500 crop;" << endl;
+    gpl << "set output \"power_traces_variance_" << x_min << "_" << x_max << ".png\";" << endl;
+    gpl << "set autoscale;" << endl;
+    gpl << "set xtic auto;" << endl;
+    gpl << "set ytic auto;" << endl;
+    gpl << "set xrange [" << x_min << ":" << x_max << "];" << endl;
+    gpl << "set key off;" << endl;
+    gpl << "set xlabel \"Sample number\";" << endl;
+    gpl << "set ylabel \"Power Trace Variance\";" << endl << endl;
+    gpl << "set style line 1 lw 5 linecolor rgb \"green\";"  << endl << endl;
+
+    gpl << "plot  ";
+    gpl << "\""<< meanFile << "\" ";
+    gpl << "u 1:3 ";
+    gpl << "t \"variance\" ";
+    gpl << "with lines ls 1";
+    
     
     cout << "[OK]" << endl;
 }

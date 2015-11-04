@@ -29,7 +29,8 @@
 /build/
 /dist/
 
-# Dat and gpl files
+# Output files
 *.dat
 *.gpl
+*.png
 creategpl
